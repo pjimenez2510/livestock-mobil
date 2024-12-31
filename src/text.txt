@@ -1,0 +1,21 @@
+# 1. Create main directories
+mkdir -p src/app/{auth/{login,register},403,management/{agenda,breed/{create,edit,list},farm}}
+
+# 2. Create farm subdirectories (using regular brackets)
+mkdir -p src/app/management/farm/id/animal/{create,edit,list}
+mkdir -p src/app/management/farm/id/lot/{create,edit,list}
+mkdir -p src/app/management/farm/id/vaccine/{create,edit,list}
+
+# 3. Create navigation directory
+mkdir -p src/navigation
+
+# 4. Create files
+touch src/app/auth/login/page.tsx
+touch src/app/auth/register/page.tsx
+touch src/app/403/page.tsx
+touch src/app/management/agenda/page.tsx
+touch src/app/management/breed/{create,edit,list}/page.tsx
+touch src/app/management/farm/id/animal/{create,edit,list}/page.tsx
+touch src/app/management/farm/id/lot/{create,edit,list}/page.tsx
+touch src/app/management/farm/id/vaccine/{create,edit,list}/page.tsx
+touch src/navigation/{AuthNavigator,ManagementNavigator,FarmNavigator,AnimalNavigator,LotNavigator,VaccineNavigator}.tsx
