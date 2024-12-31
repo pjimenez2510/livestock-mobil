@@ -46,7 +46,7 @@ export default function HomeScreen() {
       {/* Hero Section */}
       <View style={styles.hero}>
         <Image
-          source={require("../../assets/images/logo-app.jpg")}
+          source={require("../../../assets/images/logo-app.jpg")}
           style={styles.logo}
           resizeMode="contain"
         />
