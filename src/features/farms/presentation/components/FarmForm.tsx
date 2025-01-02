@@ -1,51 +1,66 @@
-import React from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
-  Image,
-  StyleSheet,
   ScrollView,
+  TouchableOpacity,
+  StyleSheet,
 } from "react-native";
-import { FormProvider } from "react-hook-form";
-import { useLogin } from "../../hooks/useLogin";
+import React from "react";
 import RHFTextInput from "@/src/shared/components/inputs/RHFTextInput";
+import { FormProvider } from "react-hook-form";
+import { useFarmForm } from "../../hooks/use-farm-form";
+import { Farm } from "../../interfaces/farm.interface";
 import { Button } from "@/src/shared/components/ui/Button";
+import RHFSelect from "@/src/shared/components/inputs/RHFSelect";
+import { purposeOptions } from "../../constants/purposeOptions";
 
-export const LoginScreen = () => {
-  const { methods, onSubmit, isSubmiting } = useLogin();
+interface FarmFormProps {
+  type?: "create" | "update";
+  farm?: Farm;
+}
+
+export default function FarmForm({ farm, type = "create" }: FarmFormProps) {
+  const { methods, onSubmit, isSubmiting } = useFarmForm({ farm });
   const { handleSubmit } = methods;
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.card}>
-        <View style={styles.logoContainer}>
-          <Image
-            source={require("../../../../../assets/images/logo-app.jpg")}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-        </View>
-
-        <Text style={styles.title}>RanchApp</Text>
-        <Text style={styles.subtitle}>La aplicación para los ganaderos</Text>
-
         <FormProvider {...methods}>
           <View style={styles.form}>
             <RHFTextInput
-              name="username"
-              label="Usuario"
-              placeholder="usuario"
-              autoComplete="username"
-              autoCapitalize="none"
-              autoCorrect={false}
+              name="name"
+              label="Nombre de la finca"
+              placeholder="Los laureles"
+              autoCapitalize="words"
             />
 
             <RHFTextInput
-              name="password"
-              label="Contraseña"
-              secureTextEntry={true}
-              placeholder="******"
+              name="address"
+              label="Dirección"
+              placeholder="Calle 123 # 1234"
+              autoCapitalize="words"
+            />
+
+            <RHFTextInput
+              name="dimension"
+              label="Dimensión"
+              placeholder="1000"
+              keyBoardType="numeric"
+            />
+
+            <RHFTextInput
+              name="purpose"
+              label="Propósito"
+              placeholder="Propósito"
+              autoCapitalize="words"
+            />
+
+            <RHFSelect
+              name="purpose"
+              label="Propósito"
+              placeholder="Propósito"
+              options={purposeOptions}
             />
 
             <Button
@@ -53,7 +68,7 @@ export const LoginScreen = () => {
               loading={isSubmiting}
               touchSoundDisabled={isSubmiting}
             >
-              Iniciar sesión
+              {type === "create" ? "Crear finca" : "Actualizar finca"}
             </Button>
 
             <View style={styles.registerContainer}>
@@ -67,7 +82,7 @@ export const LoginScreen = () => {
       </View>
     </ScrollView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {

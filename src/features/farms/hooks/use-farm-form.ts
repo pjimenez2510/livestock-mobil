@@ -8,6 +8,7 @@ import { FarmService } from "../services/farm.service";
 import { useFarmStore } from "../context/use-farm-store";
 import queryClient from "@/src/core/infrastructure/react-query/query-client";
 import { QUERY_KEYS } from "@/src/shared/constants/query-key";
+import { useRouter } from "expo-router";
 
 const schema = z.object({
   name: z.string().min(1, "El nombre de la finca es requerida"),
@@ -28,6 +29,7 @@ interface FarmFormProps {
 
 export const useFarmForm = ({ farm }: FarmFormProps) => {
   const { setFarm } = useFarmStore();
+  const router = useRouter();
   const methods = useForm<FormFields>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -45,6 +47,7 @@ export const useFarmForm = ({ farm }: FarmFormProps) => {
         .then((response) => {
           queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.FARMS] });
           setFarm({ farm: response });
+          router.push("/(app)/management/farm/[id]/", { id: response.id });
         })
         .catch((error) => {
           console.error(error);

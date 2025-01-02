@@ -6,7 +6,7 @@ import { z } from "zod";
 import { useAuthStore } from "../context/useAuthStore";
 
 const schema = z.object({
-  username: z.string().min(1, "El email es requerido"),
+  username: z.string().min(1, "El usuario es requerido"),
   password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
 });
 

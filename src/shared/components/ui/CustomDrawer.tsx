@@ -7,6 +7,7 @@ import { useFarmsQuery } from "@/src/features/farms/hooks/use-farm-query";
 import { ScrollView } from "react-native-gesture-handler";
 import { useAuth } from "@/src/core/providers/AuthProvider";
 import { useFarmStore } from "@/src/features/farms/context/use-farm-store";
+import { useAuthStore } from "@/src/features/auth/context/useAuthStore";
 
 interface MenuItem {
   label: string;
@@ -21,7 +22,7 @@ interface MenuItem {
 
 const CustomDrawer: React.FC = () => {
   const router = useRouter();
-  const { signOut } = useAuth();
+  const { signOut } = useAuthStore();
   const { data: farms, isFetching } = useFarmsQuery();
   const { farm } = useFarmStore();
   const [expandedSections, setExpandedSections] = useState<string[]>([]);

@@ -10,7 +10,6 @@ interface FarmProviderProps {
 
 export const FarmProvider: React.FC<FarmProviderProps> = ({ children }) => {
   const { loading, setFarm } = useFarmStore((state) => state);
-  const { data: farms, isFetching } = useFarmsQuery();
   const { id } = useLocalSearchParams();
   useEffect(() => {
     setFarm({ idFarm: Number(id) });
