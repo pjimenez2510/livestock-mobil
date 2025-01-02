@@ -1,9 +1,16 @@
 import { Redirect, Stack, useRouter, useSegments } from "expo-router";
-import { useAuth } from "../../core/providers/AuthProvider";
 import { ActivityIndicator } from "react-native";
+import { useAuthStore } from "../features/auth/context/useAuthStore";
+import { useEffect } from "react";
 
 export default function AppLayout() {
-  const { isLoading, token } = useAuth();
+  const { isLoading, token, initialize } = useAuthStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    initialize();
+  }, []);
+
   const segments = useSegments();
   if (isLoading) return <ActivityIndicator />;
 
@@ -11,9 +18,9 @@ export default function AppLayout() {
   const isAllowedRoute = segments[0] === "403";
 
   if (isPriveteRoute && !token) {
-    return <Redirect href={"/(app)/auth/login"} />;
+    router.replace("/auth/login");
   } else if (!isPriveteRoute && token && !isAllowedRoute) {
-    return <Redirect href={"/(app)/management/farm"} />;
+    router.replace("/management/farm");
   }
 
   return (

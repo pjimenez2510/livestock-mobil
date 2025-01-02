@@ -19,6 +19,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const storage = Storage.getInstance();
+  const authService = AuthService.getInstance();
 
   useEffect(() => {
     loadStoredAuth();
@@ -42,7 +43,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signIn = async (username: string, password: string) => {
     try {
-      const authService = AuthService.getInstance();
       const response = await authService.login({ username, password });
 
       await storage.setItem("userToken", response.access_token);
@@ -77,7 +77,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error("useSession must be wrapped in a <SessionProvider />");
   }
   return context;
 };

@@ -22,7 +22,6 @@ export const LoginScreen = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.card}>
-        {/* Logo */}
         <View style={styles.logoContainer}>
           <Image
             source={require("../../../../../assets/images/logo-app.jpg")}
@@ -31,11 +30,9 @@ export const LoginScreen = () => {
           />
         </View>
 
-        {/* App Name */}
         <Text style={styles.title}>RanchApp</Text>
         <Text style={styles.subtitle}>La aplicación para los ganaderos</Text>
 
-        {/* Form */}
         <View style={styles.form}>
           <Controller
             control={control}

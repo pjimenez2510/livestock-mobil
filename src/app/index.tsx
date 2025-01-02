@@ -1,19 +1,9 @@
 import React from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  StyleSheet,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 
 export default function HomeScreen() {
-  const navigation = useNavigation();
-
   const features = [
     {
       icon: "map",
@@ -46,7 +36,7 @@ export default function HomeScreen() {
       {/* Hero Section */}
       <View style={styles.hero}>
         <Image
-          source={require("../../../assets/images/logo-app.jpg")}
+          source={require("../../assets/images/logo-app.jpg")}
           style={styles.logo}
           resizeMode="contain"
         />
