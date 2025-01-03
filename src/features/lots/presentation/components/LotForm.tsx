@@ -1,27 +1,29 @@
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import React from "react";
-import RHFTextInput from "@/src/shared/components/inputs/RHFTextInput";
 import { FormProvider } from "react-hook-form";
-import { useFarmForm } from "../../hooks/use-farm-form";
-import { Farm } from "../../interfaces/farm.interface";
 import { Button } from "@/src/shared/components/ui/Button";
 import RHFSelect from "@/src/shared/components/inputs/RHFSelect";
+import RHFTextInput from "@/src/shared/components/inputs/RHFTextInput";
+import { useLotForm } from "../../hooks/use-lot-form";
+import { Lot } from "../../interfaces/lots.interface";
 import { purposeOptions } from "../../constants/purposeOptions";
+import { useFarmsQuery } from "@/src/features/farms/hooks/use-farm-query";
 
-interface FarmFormProps {
+interface LotFormProps {
   type?: "create" | "update";
-  farm?: Farm;
+  lot?: Lot;
 }
 
-export default function FarmForm({ farm, type = "create" }: FarmFormProps) {
-  const { methods, onSubmit, isSubmiting } = useFarmForm({ farm });
+export default function LotForm({ lot, type = "create" }: LotFormProps) {
+  const { methods, onSubmit, isSubmiting } = useLotForm({ lot });
   const { handleSubmit } = methods;
+  const { data: farms } = useFarmsQuery();
+
+  const farmOptions =
+    farms?.map((farm) => ({
+      value: String(farm.id),
+      label: farm.name,
+    })) || [];
 
   return (
     <ScrollView style={styles.container}>
@@ -30,13 +32,7 @@ export default function FarmForm({ farm, type = "create" }: FarmFormProps) {
           <View style={styles.form}>
             <RHFTextInput
               name="name"
-              label="Nombre de la finca"
-              autoCapitalize="words"
-            />
-
-            <RHFTextInput
-              name="address"
-              label="Dirección"
+              label="Nombre del lote"
               autoCapitalize="words"
             />
 
@@ -52,12 +48,22 @@ export default function FarmForm({ farm, type = "create" }: FarmFormProps) {
               options={purposeOptions}
             />
 
+            {type === "update" && (
+              <RHFSelect
+                name="farmId"
+                label="Cambio de finca"
+                options={farmOptions}
+                searchPlaceholder="Buscar finca..."
+                searchable
+              />
+            )}
+
             <Button
               onPress={handleSubmit(onSubmit)}
               loading={isSubmiting}
               touchSoundDisabled={isSubmiting}
             >
-              {type === "create" ? "Crear finca" : "Actualizar finca"}
+              {type === "create" ? "Crear lote" : "Actualizar lote"}
             </Button>
           </View>
         </FormProvider>

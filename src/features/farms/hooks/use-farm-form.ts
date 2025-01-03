@@ -8,7 +8,8 @@ import { FarmService } from "../services/farm.service";
 import { useFarmStore } from "../context/use-farm-store";
 import queryClient from "@/src/core/infrastructure/react-query/query-client";
 import { QUERY_KEYS } from "@/src/shared/constants/query-key";
-import { useRouter } from "expo-router";
+import { Href, useRouter } from "expo-router";
+import { useToast } from "react-native-toast-notifications";
 
 const schema = z.object({
   name: z.string().min(1, "El nombre de la finca es requerida"),
@@ -30,6 +31,7 @@ interface FarmFormProps {
 export const useFarmForm = ({ farm }: FarmFormProps) => {
   const { setFarm } = useFarmStore();
   const router = useRouter();
+  const toast = useToast();
   const methods = useForm<FormFields>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -45,9 +47,11 @@ export const useFarmForm = ({ farm }: FarmFormProps) => {
       await FarmService.getInstance()
         .update(farm.id, data)
         .then((response) => {
+          toast.show(`Finca ${response.name} actualizada`, { type: "success" });
           queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.FARMS] });
           setFarm({ farm: response });
-          router.push("/(app)/management/farm/[id]/", { id: response.id });
+          router.replace(`/(app)/management/farm/${response.id}` as Href);
+          methods.reset();
         })
         .catch((error) => {
           console.error(error);
@@ -57,8 +61,13 @@ export const useFarmForm = ({ farm }: FarmFormProps) => {
     await FarmService.getInstance()
       .create(data)
       .then((response) => {
+        toast.show(`Finca ${response.name} creada correctamente`, {
+          type: "success",
+        });
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.FARMS] });
         setFarm({ farm: response });
+        router.replace(`/(app)/management/farm/${response.id}` as Href);
+        methods.reset();
       })
       .catch((error) => {
         console.error(error);

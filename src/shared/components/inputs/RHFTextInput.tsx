@@ -88,7 +88,7 @@ export default function RHFTextInput({
   autoCapitalize = "sentences",
   autoComplete = "off",
   autoCorrect = true,
-  autoFocus = true,
+  autoFocus = false,
   secureTextEntry = false,
 }: RHFTextInputProps) {
   const {

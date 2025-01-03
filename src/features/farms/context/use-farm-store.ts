@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { Farm } from "../interfaces/farm.interface";
 import { FarmService } from "../services/farm.service";
-import { router } from "expo-router";
 interface SetFarmParams {
   farm?: Farm;
   idFarm?: number;
@@ -17,7 +16,11 @@ export const useFarmStore = create<FarmStore>((set) => ({
   loading: true,
   error: null,
   setFarm: async ({ idFarm, farm }) => {
-    console.log("idFarm", idFarm);
+    set({
+      farm: undefined,
+      loading: true,
+    });
+
     if (farm) {
       set({
         farm,
@@ -25,10 +28,6 @@ export const useFarmStore = create<FarmStore>((set) => ({
       });
       return;
     }
-    set({
-      farm: undefined,
-      loading: true,
-    });
 
     if (!idFarm) {
       await FarmService.getInstance()
@@ -40,7 +39,6 @@ export const useFarmStore = create<FarmStore>((set) => ({
           });
         })
         .catch((error) => {
-          router.setParams({ id: idFarm });
           set({
             farm: undefined,
             loading: false,

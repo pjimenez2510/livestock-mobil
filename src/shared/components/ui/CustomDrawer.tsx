@@ -5,7 +5,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { Href, useRouter } from "expo-router";
 import { useFarmsQuery } from "@/src/features/farms/hooks/use-farm-query";
 import { ScrollView } from "react-native-gesture-handler";
-import { useAuth } from "@/src/core/providers/AuthProvider";
 import { useFarmStore } from "@/src/features/farms/context/use-farm-store";
 import { useAuthStore } from "@/src/features/auth/context/useAuthStore";
 
@@ -24,10 +23,15 @@ const CustomDrawer: React.FC = () => {
   const router = useRouter();
   const { signOut } = useAuthStore();
   const { data: farms, isFetching } = useFarmsQuery();
-  const { farm } = useFarmStore();
+  const { farm, setFarm } = useFarmStore();
   const [expandedSections, setExpandedSections] = useState<string[]>([]);
 
   const menuItems: MenuItem[] = [
+    {
+      label: "Mi finca",
+      icon: "home-outline",
+      route: "/management/farm/[id]",
+    },
     {
       label: "Lotes",
       icon: "grid-outline",
@@ -108,6 +112,7 @@ const CustomDrawer: React.FC = () => {
   }> = ({ item, isSubItem = false, depth = 0 }) => {
     const isExpanded = expandedSections.includes(item.label);
     const paddingLeft = 24 + depth * 16;
+    const {} = useFarmStore();
 
     return (
       <View>
@@ -191,7 +196,12 @@ const CustomDrawer: React.FC = () => {
             </Text>
           </TouchableOpacity>
         ))}
-        <TouchableOpacity style={styles.addRanchButton}>
+        <TouchableOpacity
+          style={styles.addRanchButton}
+          onPress={() => {
+            router.replace("/management/farm/create");
+          }}
+        >
           <Ionicons name="add" size={24} color="#444" />
         </TouchableOpacity>
       </ScrollView>

@@ -21,6 +21,7 @@ export default function Layout() {
   }
 
   if (!isPriveteRoute && token) {
+    console.log("Redirect to management");
     return <Redirect href="/(app)/management/farm" />;
   }
 

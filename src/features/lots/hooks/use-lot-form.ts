@@ -36,7 +36,7 @@ export const useLotForm = ({ lot }: LotFormProps) => {
       name: lot?.name || "",
       dimension: lot?.dimension || undefined,
       purpose: lot?.purpose || undefined,
-      farmId: String(farm?.id) || undefined,
+      farmId: String(lot?.farmId) || undefined,
     },
   });
 
@@ -47,8 +47,8 @@ export const useLotForm = ({ lot }: LotFormProps) => {
         .update(lot.id, { ...data, farmId: Number(data.farmId) })
         .then(() => {
           queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.LOTS] });
-          const route = `/management/farm/${farm?.id}/lot/list`;
-          router.push(route as any);
+          router.replace(`/management/farm/${farm?.id}/lot` as Href);
+          methods.reset();
         })
         .catch((error) => {
           console.error(error);
@@ -56,10 +56,11 @@ export const useLotForm = ({ lot }: LotFormProps) => {
       return;
     }
     await LotService.getInstance()
-      .create({ ...data, farmId: Number(data.farmId) })
+      .create({ ...data, farmId: farm.id })
       .then(() => {
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.LOTS] });
-        router.push(`/management/farm/${farm?.id}/lot/list` as Href);
+        router.replace(`/management/farm/${farm?.id}/lot` as Href);
+        methods.reset();
       })
       .catch((error) => {
         console.error(error);

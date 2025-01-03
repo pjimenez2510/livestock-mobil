@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Modal,
   FlatList,
   SafeAreaView,
+  TextInput,
 } from "react-native";
 import { Controller, useFormContext } from "react-hook-form";
 
@@ -23,7 +24,139 @@ interface RHFSelectProps {
   options: Option[];
   searchable?: boolean;
   multiple?: boolean;
+  searchPlaceholder?: string;
 }
+
+const SelectModal = ({
+  visible,
+  onClose,
+  value,
+  onChange,
+  options,
+  multiple,
+  searchable,
+  searchPlaceholder = "Buscar...",
+  label,
+}: {
+  visible: boolean;
+  onClose: () => void;
+  value: any;
+  onChange: (value: any) => void;
+  options: Option[];
+  multiple?: boolean;
+  searchable?: boolean;
+  searchPlaceholder?: string;
+  label?: string;
+}) => {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filterOptions = useCallback(
+    (query: string) => {
+      if (!query) return options;
+      const normalizedQuery = query.toLowerCase();
+      return options.filter((option) =>
+        option.label.toLowerCase().includes(normalizedQuery)
+      );
+    },
+    [options]
+  );
+
+  const filteredOptions = filterOptions(searchQuery);
+
+  const handleClose = () => {
+    setSearchQuery("");
+    onClose();
+  };
+
+  return (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={visible}
+      onRequestClose={handleClose}
+    >
+      <SafeAreaView style={styles.modalContainer}>
+        <View style={styles.modalContent}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>{label || "Seleccionar"}</Text>
+            <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>Cerrar</Text>
+            </TouchableOpacity>
+          </View>
+
+          {searchable && (
+            <View style={styles.searchContainer}>
+              <TextInput
+                style={styles.searchInput}
+                placeholder={searchPlaceholder}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                autoCorrect={false}
+                clearButtonMode="while-editing"
+              />
+            </View>
+          )}
+
+          <FlatList
+            data={filteredOptions}
+            keyExtractor={(item) => item.value.toString()}
+            ListEmptyComponent={() => (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>
+                  No se encontraron resultados
+                </Text>
+              </View>
+            )}
+            renderItem={({ item }) => {
+              const isSelected = multiple
+                ? Array.isArray(value) && value.includes(item.value)
+                : value === item.value;
+
+              return (
+                <TouchableOpacity
+                  style={[
+                    styles.optionItem,
+                    isSelected && styles.selectedOption,
+                  ]}
+                  onPress={() => {
+                    if (multiple) {
+                      const newValue = Array.isArray(value) ? [...value] : [];
+                      const index = newValue.indexOf(item.value);
+                      if (index > -1) {
+                        newValue.splice(index, 1);
+                      } else {
+                        newValue.push(item.value);
+                      }
+                      onChange(newValue);
+                    } else {
+                      onChange(item.value);
+                      handleClose();
+                    }
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.optionText,
+                      isSelected && styles.selectedOptionText,
+                    ]}
+                  >
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
+          />
+
+          {multiple && (
+            <TouchableOpacity style={styles.doneButton} onPress={handleClose}>
+              <Text style={styles.doneButtonText}>Listo</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </SafeAreaView>
+    </Modal>
+  );
+};
 
 export default function RHFSelect({
   name,
@@ -33,6 +166,7 @@ export default function RHFSelect({
   options,
   searchable = false,
   multiple = false,
+  searchPlaceholder,
 }: RHFSelectProps) {
   const {
     control,
@@ -59,81 +193,6 @@ export default function RHFSelect({
     return options.find((opt) => opt.value === value)?.label || "";
   };
 
-  const SelectModal = ({ value, onChange }: any) => (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={modalVisible}
-      onRequestClose={() => setModalVisible(false)}
-    >
-      <SafeAreaView style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>{label || "Seleccionar"}</Text>
-            <TouchableOpacity
-              onPress={() => setModalVisible(false)}
-              style={styles.closeButton}
-            >
-              <Text style={styles.closeButtonText}>Cerrar</Text>
-            </TouchableOpacity>
-          </View>
-
-          <FlatList
-            data={options}
-            keyExtractor={(item) => item.value.toString()}
-            renderItem={({ item }) => {
-              const isSelected = multiple
-                ? Array.isArray(value) && value.includes(item.value)
-                : value === item.value;
-
-              return (
-                <TouchableOpacity
-                  style={[
-                    styles.optionItem,
-                    isSelected && styles.selectedOption,
-                  ]}
-                  onPress={() => {
-                    if (multiple) {
-                      const newValue = Array.isArray(value) ? [...value] : [];
-                      const index = newValue.indexOf(item.value);
-                      if (index > -1) {
-                        newValue.splice(index, 1);
-                      } else {
-                        newValue.push(item.value);
-                      }
-                      onChange(newValue);
-                    } else {
-                      onChange(item.value);
-                      setModalVisible(false);
-                    }
-                  }}
-                >
-                  <Text
-                    style={[
-                      styles.optionText,
-                      isSelected && styles.selectedOptionText,
-                    ]}
-                  >
-                    {item.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            }}
-          />
-
-          {multiple && (
-            <TouchableOpacity
-              style={styles.doneButton}
-              onPress={() => setModalVisible(false)}
-            >
-              <Text style={styles.doneButtonText}>Listo</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      </SafeAreaView>
-    </Modal>
-  );
-
   return (
     <Controller
       control={control}
@@ -158,7 +217,17 @@ export default function RHFSelect({
 
           <Text style={styles.errorText}>{getErrorMessage(name)}</Text>
 
-          <SelectModal value={value} onChange={onChange} />
+          <SelectModal
+            visible={modalVisible}
+            onClose={() => setModalVisible(false)}
+            value={value}
+            onChange={onChange}
+            options={options}
+            multiple={multiple}
+            searchable={searchable}
+            searchPlaceholder={searchPlaceholder}
+            label={label}
+          />
         </View>
       )}
     />
@@ -199,12 +268,12 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.16)",
   },
   modalContent: {
     flex: 1,
     backgroundColor: "white",
-    marginTop: 50,
+    marginTop: 250,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
@@ -224,7 +293,19 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   closeButtonText: {
-    color: "#007AFF",
+    color: "rgb(56, 179, 40)",
+    fontSize: 16,
+  },
+  searchContainer: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  searchInput: {
+    height: 40,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 8,
+    paddingHorizontal: 12,
     fontSize: 16,
   },
   optionItem: {
@@ -233,14 +314,14 @@ const styles = StyleSheet.create({
     borderBottomColor: "#eee",
   },
   selectedOption: {
-    backgroundColor: "#f0f9ff",
+    backgroundColor: "rgb(233, 255, 230)",
   },
   optionText: {
     fontSize: 16,
     color: "#333",
   },
   selectedOptionText: {
-    color: "#007AFF",
+    color: "rgb(56, 179, 40)",
   },
   doneButton: {
     margin: 16,
@@ -253,5 +334,13 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "600",
+  },
+  emptyContainer: {
+    padding: 24,
+    alignItems: "center",
+  },
+  emptyText: {
+    fontSize: 16,
+    color: "#666",
   },
 });

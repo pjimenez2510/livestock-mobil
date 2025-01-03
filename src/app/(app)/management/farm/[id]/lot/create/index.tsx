@@ -1,10 +1,12 @@
-import { View, Text } from "react-native";
 import React from "react";
+import LotCreate from "@/src/features/lots/presentation/screen/LotCreate";
+import Drawer from "expo-router/drawer";
 
 export default function CreateLotScreen() {
   return (
-    <View>
-      <Text>CreateLotPage</Text>
-    </View>
+    <>
+      <Drawer.Screen options={{ headerTitle: "Nuevo Lote" }} />
+      <LotCreate />
+    </>
   );
 }
